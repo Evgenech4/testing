@@ -1,154 +1,727 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Просроченный йогурт</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preload" href="./Backs/1.jpg" as="image">
+    <link rel="preload" href="./Backs/2.jpg" as="image">
+    <link rel="preload" href="./Backs/3.jpg" as="image">
+    <link rel="preload" href="./Backs/4.jpg" as="image">
+    <link rel="preload" href="./Backs/5.jpg" as="image">
+    <link rel="preload" href="./Backs/6.jpg" as="image">
+    <link rel="preload" href="./Backs/7.jpg" as="image">
+    <link rel="preload" href="./Backs/8.jpg" as="image">
+    <style>
+        body{
+            margin: 0;
+            font-family: "Montserrat", sans-serif;
+        }
 
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      font-family: sans-serif;
-    }
+        *{
+            box-sizing: border-box;
+        }
 
-    body {
-      background: url('man.png') no-repeat;
-      background-size: 110% auto;
-      background-position: left -10px top -40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      position: relative;
-    }
+        .game_container, .start_modal, .continue_modal, #end_modal {
+            width: 450px;
+            height: 940px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
 
-    .happiness-bar {
-      width: 80%;
-      margin: 10px 0;
-    }
+        .game_container{
+            justify-content: end;
+        }
 
-    .question-box {
-      background-color: white;
-      width: 100%;
-      padding: 15px;
-      position: absolute;
-      bottom: 0px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      border-radius: 10px;
-    }
+        .start_modal, .continue_modal, #end_modal {
+            background: url(background.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+        }
 
-    .question-box h3 {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
+        .start_modal.active, .continue_modal.active, #end_modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
 
-    .question-box p {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
+        .continue_modal{
+            z-index: 50;
+            color: white;
+        }
 
-    .answers {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+        .game_container {
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+        }
 
-    .answers button {
-      padding: 10px;
-      font-size: 14px;
-      border: 2px solid red;
-      border-radius: 8px;
-      background: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+        .game_container.active {
+            opacity: 1;
+            pointer-events: all;
+        }
 
-    .answers button:hover {
-      background: #ffe6e6;
-    }
+        .modal_box{
+            width: 93%;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            background-color: white;
+            color: #1F1F1F;
+        }
 
-    /* Модалка */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      backdrop-filter: blur(5px);
-      background-color: rgba(0, 0, 0, 0.3);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
+        .modal_box_title{
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
 
-    .modal {
-      background: white;
-      padding: 10px;
-      width: 85%;
-      border-radius: 10px;
-      text-align: center;
-    }
+        .modal_box_text{
+            font-size: 18px;
+            font-weight: 400;
+        }
 
-    .modal h2 {
-      font-size: 18px;
-      color: red;
-      margin-bottom: 10px;
-    }
+        .modal_box_btn{
+            width: 90%;
+            height: 40px;
+            margin-top: 15px;
+            font-family: "Montserrat", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            color: white;
+            background-color: #E30614;
+            border: none;
+            border-radius: 8px;
+        }
 
-    .modal p {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
+        .continue_title{
+            font-weight: 400;
+            font-size: 24px;
+            line-height: 24px;
+            letter-spacing: 0%;
+            text-align: center;
+        }
 
-    .modal button {
-      background: red;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      width: 100%;
-    }
-  </style>
+        .continue_text{
+            font-weight: 700;
+            font-size: 40px;
+            line-height: 44px;
+            letter-spacing: 0%;
+            text-align: center;
+        }
+
+        .manimg{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 450px;
+            z-index: -1;
+            transition: all 0.3s;
+        }
+
+        .pulse {
+            animation: pulse 1.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .happiness{
+            top: 20px;
+            left: 9%;
+            width: 320px;
+            height: 70px;
+            display: none;
+            justify-content: space-between;
+            padding: 35px 13px;
+            left: 50%;
+            transform: translate(-50%);
+            z-index: 2001;
+            position: fixed;
+        }
+
+        .happinessimg{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2001;
+        }
+
+        .emotion{
+            width: 24px;
+            height: 24px;
+            z-index: 2201;
+            transition: all 0.3s;
+        }
+
+        .questioncontainer{
+            width: 100%;
+            height: 360px;
+            margin-bottom: 50px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            border-radius: 16px 16px 0 0;
+        }
+        .questionimg{
+            width: 450px;
+            position: absolute;
+            z-index: -1;
+        }
+
+        .question{
+            width: 90%;
+            height: 60px;
+            z-index: 100;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: none;
+            border-radius: 10px;
+            text-align: start;
+            background-color: white;
+            font-family: "Montserrat", sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            outline: 0;
+            border: 1px solid black;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        .question:first-child {
+            margin-top: 140px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1500;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background-color: white;
+            width: 85%;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .modal-text {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-button {
+            padding: 12px 25px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .dots {
+            width: 90%;
+            display: flex;
+            margin-top: 15px;
+            justify-content: start;
+            gap: 8px;
+        }
+        .dot{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+        }
+
+        .situation{
+            width: 90%;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #8F8F8F;
+        }
+
+        .instruction{
+            width: 90%;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        @media (max-width: 450px) {
+            .game_container, .start_modal, .continue_modal, #end_modal {
+                width: 100%;
+                height: 100vh;
+            }
+
+            .questionimg{
+                width: 100%;
+            }
+
+            .manimg{
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <img src="happiness.png" class="happiness-bar"></img>
-
-  <div class="question-box">
-    <h3>Ситуация 1. Просроченный йогурт</h3>
-    <p><strong>Инструкция:</strong> Вы нашли йогурт с истекшим сроком. Что делать?</p>
-    <div class="answers">
-      <button onclick="openModal()">А. Убрать с полки и проверить всю партию</button>
-      <button onclick="openModal()">Б. Переложить вглубь полки</button>
-      <button onclick="openModal()">В. Убрать с полки и списать</button>
+    <div class="start_modal active" id="start_modal">
+        <div class="modal_box">
+            <div class="modal_box_title">Инструкция</div>
+            <div class="modal_box_text">Каждый день тысячи покупателей приходят в «Магнит». Ваша задача — сделать так, чтобы они приходили снова. Проверьте, сможете ли вы создать идеальный торговый зал! Осмотрите магазин, найдите и исправьте все нарушения!</div>
+            <button class="modal_box_btn" id="modal_box_btn">Вперед!</button>
+        </div>
     </div>
-  </div>
 
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <h2>Так делать не стоит</h2>
-      <p>Это нарушение санитарных норм. Покупатель может случайно взять просрочку, что приведет к отравлению и жалобам в Роспотребнадзор.</p>
-      <button onclick="closeModal()">Продолжить</button>
+    <div class="continue_modal" id="continue_modal">
+        <div class="continue_title">Локация: <span id="location_number">1</span></div>
+        <div class="continue_text" id="location_name">Молочная полка</div>
     </div>
-  </div>
 
-  <script>
-    function openModal() {
-      document.getElementById('modal').style.display = 'flex';
-    }
+    <div class="start_modal" id="end_modal">
+        <div class="modal_box">
+            <div class="modal_box_title">Спасибо за участие!</div>
+            <div class="modal_box_text">Качественный сервис — это не только скорость и точность, но и внимательное отношение к каждому покупателю. От вашей работы зависит настроение людей и доверие к магазину. Работайте с душой — и результат не заставит себя ждать!</div>
+        </div>
+    </div>
 
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-  </script>
+    <div class="happiness">
+        <img src="Happiness/50.png" alt="happinessimg" class="happinessimg" id="happiness_img">
+        <img src="Happiness/fail.png" alt="failed" class="emotion" id="fail_emotion">
+        <img src="Happiness/normal.png" alt="normal" class="emotion" id="normal_emotion">
+        <img src="Happiness/good.png" alt="good" class="emotion" id="good_emotion">
+    </div>
+
+    <div class="game_container" id="game_container">
+        <img src="Backs/1.jpg" alt="man" class="manimg" id="man_img">
+        <div class="questioncontainer">
+            <div class="dots" id="dots_container">
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="situation" id="situation_text"></div>
+            <div class="instruction" id="instruction_text"></div>
+            <button class="question" id="question_a"><strong>А.</strong> <span id="option_a"></span></button>
+            <button class="question" id="question_b"><strong>Б.</strong> <span id="option_b"></span></button>
+            <button class="question" id="question_c"><strong>В.</strong> <span id="option_c"></span></button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-title" id="modal_title"></div>
+            <div class="modal-text" id="modal_text"></div>
+            <button class="modal-button" id="modalCloseButton">Продолжить</button>
+        </div>
+    </div>
+
+    <script>
+        const gameData = [
+            {
+                "Локация": "Молочная полка",
+                "Ситуация": "Просроченный йогурт",
+                "Инструкция": "Вы нашли йогурт с истекшим сроком. Что делать?",
+                "вариантдляа": "Убрать с полки и проверить остаток по позиции",
+                "ответдляа": "Правильно! Если вы заметили один просроченный товар, значит нужно оперативно проверить всю полку, не исключено, что другие товары из этой позиции тоже могут оказаться просроченными",
+                "статусдляа": "good",
+                "вариантдляб": "Переложить вглубь полки",
+                "ответдляб": "Так делать не стоит! Это нарушение санитарных норм. Покупатель может случайно взять просрочку, что приведет к отравлению и жалобам в Роспотребнадзор",
+                "статусдляб": "fail",
+                "вариантдляв": "Убрать с полки и списать",
+                "ответдляв": "Хорошо! Испорченный товар нужно немедленно убрать – это влияет на безопасность покупателей и репутацию магазина. Но обратите внимание, что если вы нашли просроченный товар, то проверить нужно всю партию!",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Молочная полка",
+                "Ситуация": "Неаккуратная выкладка",
+                "Инструкция": "Товар выложен небрежно. Как исправить?",
+                "вариантдляа": "Аккуратно расставить в соответствии с планограммой",
+                "ответдляа": "Идеально! Четкая выкладка увеличивает продажи – покупатели быстрее находят нужный товар. Это особенно важно для акционных позиций",
+                "статусдляа": "good",
+                "вариантдляб": "Оставить как есть и привести полку в порядок, когда будет время",
+                "ответдляб": "Это не решение проблемы! Хаотичная выкладка раздражает покупателей и создает впечатление беспорядка",
+                "статусдляб": "fail",
+                "вариантдляв": "Аккуратно расставить на свой вкус",
+                "ответдляв": "Аккуратность в выкладке очень важна, но не стоит забывать о планограмме. Выкладка по планограмме создает ощущение порядка и позволяет покупателям быстрее находить нужный товар, а вам - быстрее замечать, какого товара не хватает на полке",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Овощи/Фрукты (ФРОВ)",
+                "Ситуация": "Гнилое яблоко",
+                "Инструкция": "Среди свежих яблок одно испорчено. Ваши действия?",
+                "вариантдляа": "Убрать гнилое яблоко, устранить следы на других яблоках",
+                "ответдляа": "Верно! Гнилые продукты создают антисанитарию и отпугивают покупателей. Ваша правильная реакция предотвратит распространение плесени, и покупатели будут рады приходить именно к нам за свежими фруктами",
+                "статусдляа": "good",
+                "вариантдляб": "Переложить вниз",
+                "ответдляб": "Опасно! Плесень быстро распространяется. Даже одно испорченное яблоко может привести к быстрой порче всей партии и появлению неприятного запаха",
+                "статусдляб": "fail",
+                "вариантдляв": "Убрать гнилое, доложить свежих сверху",
+                "ответдляв": "Недостаточно! Важно убедиться, что следы с гнилого яблока не попали на другие яблоки. Новые яблоки временно скроют проблему, но гниль останется, и скоро начнут портиться другие яблоки, добавив вам работы, а покупателям неприятных впечатлений",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Овощи/Фрукты (ФРОВ)",
+                "Ситуация": "Лужа воды",
+                "Инструкция": "Возле фруктового стеллажа лужа. Что делать?",
+                "вариантдляа": "Вытереть и поставить знак 'Осторожно! Скользкий пол!'",
+                "ответдляа": "Отлично! Вы предотвратили риск падения и показали заботу о безопасности покупателей. Обязательно убедитесь, что лужа образовалась не из-за испорченных фруктов",
+                "статусдляа": "good",
+                "вариантдляб": "Закрыть коробкой",
+                "ответдляб": "Недопустимо! Это создает угрозу для покупателей и сотрудников. При таком решении магазин получает не только низкие оценки от покупателей, но может также получить штраф за нарушение техники безопасности",
+                "статусдляб": "fail",
+                "вариантдляв": "Позвать уборщицу",
+                "ответдляв": "Не лучший вариант. Небольшие лужи сотрудник зала может устранять самостоятельно – это часть сервисных привычек",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Акционный стенд",
+                "Ситуация": "Отсутствует ценник",
+                "Инструкция": "На акционном кофе нет цены. Как поступить?",
+                "вариантдляа": "Распечатать новый ценник и разместить его",
+                "ответдляа": "Правильно! За акционным товаром к нам приходят покупатели. Отсутствие ценника – частая причина конфликтов. Ваши действия помогут избежать негативного опыта покупателей и снижения оценок",
+                "статусдляа": "good",
+                "вариантдляб": "Подождать, пока покупатели спросят сами",
+                "ответдляб": "Не стоит! Отсутствие ценника – частая причина конфликтов. Все товары и акции должны быть промаркированы",
+                "статусдляб": "fail",
+                "вариантдляв": "Дождаться времени, когда вы запланировали работу с ценниками, и тогда распечатать",
+                "ответдляв": "Хорошо, что вы выделяете эту задачу, как важную, но клиенты не должны ждать!",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Акционный стенд",
+                "Ситуация": "Акционный товар завален",
+                "Инструкция": "Акционный чай не видно за обычными упаковками. Как исправить?",
+                "вариантдляа": "Выставить акционный товар на полке в соответствии с планограммой",
+                "ответдляа": "Верное решение! Акционные товары должны бросаться в глаза – это увеличивает продажи",
+                "статусдляа": "good",
+                "вариантдляб": "Разложить ровно без выделения",
+                "ответдляб": "Упущенная выгода! Если акция не заметна, магазин теряет прибыль, а покупатели – возможность сэкономить",
+                "статусдляб": "fail",
+                "вариантдляв": "Спросить у директора или товароведа, что делать",
+                "ответдляв": "Хорошо, что вы не игнорируете проблему, но обязательно и как можно скорее изучите базовые правила выкладки!",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Зона касс",
+                "Ситуация": "Пыль на полке",
+                "Инструкция": "Полка у кассы покрыта пылью. Что делать?",
+                "вариантдляа": "Протереть полку, используя спецсредства",
+                "ответдляа": "Именно так! Чистота в зоне касс влияет на финальное впечатление покупателя. Чистота создает ощущение безопасности и доверия",
+                "статусдляа": "good",
+                "вариантдляб": "Смахнуть рукой",
+                "ответдляб": "Неэффективно! Пыль разлетится по товарам, на полке останутся следы, которые, наверняка, заметят внимательные покупатели. Используйте спецсредства!",
+                "статусдляб": "fail",
+                "вариантдляв": "Оставить до следующей уборки",
+                "ответдляв": "Не стоит ждать! Мелкие загрязнения нужно устранять сразу – это формирует общее впечатление о магазине",
+                "статусдляв": "normal"
+            },
+            {
+                "Локация": "Зона касс",
+                "Ситуация": "Неразобранная тележка",
+                "Инструкция": "У кассы бросили тележку с коробками. Ваши действия?",
+                "вариантдляа": "Разобрать",
+                "ответдляа": "Правильно! Беспорядок в торговом зале снижает доверие покупателей. Разбирая товар сразу, вы поддерживаете стандарты «Магнита»",
+                "статусдляа": "good",
+                "вариантдляб": "Оставить, как есть, и найти того, кто оставил тележку",
+                "ответдляб": "Тележка мешает перемещениям покупателей. Важно хотя бы убрать ее с прохода, если нет возможности разобрать сразу",
+                "статусдляб": "fail",
+                "вариантдляв": "Убрать с прохода",
+                "ответдляв": "Неплохое решение, но временное! Важно разбирать тележки с товаром как можно быстрее",
+                "статусдляв": "normal"
+            }
+        ];
+
+        // DOM elements
+        const questionButtons = document.querySelectorAll('.question');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+        const modalboxButton = document.getElementById('modal_box_btn');
+        const startModal = document.getElementById('start_modal');
+        const continueModal = document.getElementById('continue_modal');
+        const gameContainer = document.getElementById('game_container');
+        const endModal = document.getElementById('end_modal');
+        
+        // Text elements
+        const situationText = document.getElementById('situation_text');
+        const instructionText = document.getElementById('instruction_text');
+        const optionAText = document.getElementById('option_a');
+        const optionBText = document.getElementById('option_b');
+        const optionCText = document.getElementById('option_c');
+        const modalTitle = document.getElementById('modal_title');
+        const modalText = document.getElementById('modal_text');
+        const locationNumber = document.getElementById('location_number');
+        const locationName = document.getElementById('location_name');
+        const manImg = document.getElementById('man_img');
+        const happinessImg = document.getElementById('happiness_img');
+        const dotsContainer = document.getElementById('dots_container');
+        
+        // Emotion images
+        const failEmotion = document.getElementById('fail_emotion');
+        const normalEmotion = document.getElementById('normal_emotion');
+        const goodEmotion = document.getElementById('good_emotion');
+        
+        // Game state
+        let showcounter = 0;
+        let currentQuestion = 0;
+        let score = 50;
+        let selectedOption = null;
+        let selectedStatus = null;
+
+        // Initialize game
+        function initGame() {
+            updateQuestion();
+            updateDots();
+            showModal(gameContainer);
+        }
+        
+        // Update question display
+        function updateQuestion() {
+            manImg.src = `Backs/${currentQuestion + 1}.jpg`;
+            const question = gameData[currentQuestion];
+            
+            // Update texts
+            situationText.textContent = question.Ситуация;
+            instructionText.textContent = question.Инструкция;
+            optionAText.textContent = question.вариантдляа;
+            optionBText.textContent = question.вариантдляб;
+            optionCText.textContent = question.вариантдляв;
+
+            // Show continue modal every 2 questions
+            if (currentQuestion % 2 === 0) {
+                showLocationModal();
+            }
+        }
+        
+        
+        // Show modal with fade in
+        function showModal(modal) {
+            modal.classList.add('active');
+            showcounter++;
+            if (modal === gameContainer && showcounter===2) {
+                setTimeout(() => {
+                    document.querySelector('.happiness').style.display = 'flex'
+                }, 2000);
+            } else if (modal === gameContainer && showcounter>2) {
+                document.querySelector('.happiness').style.display = 'flex'
+            }
+        }
+        
+        // Hide modal with fade out
+        function hideModal(modal) {
+            modal.classList.remove('active');
+            if (modal === gameContainer) {
+                document.querySelector('.happiness').style.display = 'none';
+            }
+        }
+        
+        // Show location modal
+        function showLocationModal() {
+            const locationIndex = Math.floor(currentQuestion / 2) + 1;
+            const question = gameData[currentQuestion];
+            
+            locationNumber.textContent = locationIndex;
+            locationName.textContent = question.Локация;
+            
+            hideModal(gameContainer);
+            showModal(continueModal);
+            
+            setTimeout(() => {
+                hideModal(continueModal);
+                showModal(gameContainer);
+            }, 2000);
+        }
+        
+        // Update dots indicator (only 2 dots)
+        function updateDots() {
+            const dots = dotsContainer.querySelectorAll('.dot');
+            
+            // Reset both dots
+            dots[0].style.backgroundColor = '#E0E0E0';
+            dots[1].style.backgroundColor = '#E0E0E0';
+            
+            // Highlight current dot (first for odd questions, second for even)
+            if (currentQuestion % 2 === 0) {
+                dots[0].style.backgroundColor = '#E30614';
+            } else {
+                dots[1].style.backgroundColor = '#E30614';
+            }
+        }
+        
+        // Handle answer selection
+        function handleAnswer(option) {
+            const question = gameData[currentQuestion];
+            let answerText = '';
+            let status = '';
+            
+            switch(option) {
+                case 'a':
+                    answerText = question.ответдляа;
+                    status = question.статусдляа;
+                    break;
+                case 'b':
+                    answerText = question.ответдляб;
+                    status = question.статусдляб;
+                    break;
+                case 'c':
+                    answerText = question.ответдляв;
+                    status = question.статусдляв;
+                    break;
+            }
+            
+            // Set modal content based on status
+            let statusText = '';
+            switch(status) {
+                case 'good':
+                    statusText = 'Правильно';
+                    break;
+                case 'normal':
+                    statusText = 'Хорошо';
+                    break;
+                case 'fail':
+                    statusText = 'Так делать не стоит!';
+                    break;
+            }
+            
+            modalTitle.textContent = statusText;
+            modalText.textContent = answerText;
+            modalOverlay.style.display = 'flex';
+            
+            // Save selected option and status
+            selectedOption = option;
+            selectedStatus = status;
+            
+            // Show emotion image
+            showEmotion(status);
+            
+            // Update score
+            updateScore(status);
+        }
+        
+        // Show emotion image
+        function showEmotion(status) {
+            // Hide all emotions first
+            
+            // Show the correct one with pulse animation
+            switch(status) {
+                case 'good':
+                    goodEmotion.classList.add('pulse');
+                    setTimeout(() => {
+                        goodEmotion.classList.remove('pulse');
+                    }, 1500);
+                    break;
+                case 'normal':
+                    normalEmotion.classList.add('pulse');
+                    setTimeout(() => {
+                        normalEmotion.classList.remove('pulse');
+                    }, 1500);
+                    break;
+                case 'fail':
+                    failEmotion.classList.add('pulse');
+                    setTimeout(() => {
+                        failEmotion.classList.remove('pulse');
+                    }, 1500);
+                    break;
+            }
+        }
+        
+        // Update score
+        function updateScore(status) {
+            switch(status) {
+                case 'good':
+                    score += 25;
+                    break;
+                case 'normal':
+                    score += 12.5;
+                    break;
+                case 'fail':
+                    score -= 12.5;
+                    break;
+            }
+            
+            // Clamp score between 0 and 100
+            score = Math.max(0, Math.min(100, score));
+            
+            // Update happiness image
+            happinessImg.src = `Happiness/${score}.png`;
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < gameData.length) {
+                manImg.src = `Backs/${currentQuestion + 1}.jpg`;
+                updateQuestion();
+                updateDots();
+            } else {
+                // Game over - show end modal
+                hideModal(gameContainer);
+                showModal(endModal);
+            }
+        }
+        
+        // Event listeners
+        modalboxButton.addEventListener('click', () => {
+            hideModal(startModal);
+            initGame();
+        });
+        
+        document.getElementById('question_a').addEventListener('click', () => handleAnswer('a'));
+        document.getElementById('question_b').addEventListener('click', () => handleAnswer('b'));
+        document.getElementById('question_c').addEventListener('click', () => handleAnswer('c'));
+        
+        modalCloseButton.addEventListener('click', function() {
+            modalOverlay.style.display = 'none';
+            nextQuestion();
+        });
+        
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.style.display = 'none';
+                nextQuestion();
+            }
+        });
+    </script>    
 </body>
 </html>
