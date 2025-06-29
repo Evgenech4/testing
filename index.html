@@ -359,6 +359,7 @@
         </div>
     </div>
 
+    <script src="./SCORM_API_wrapper.js"></script>
     <script>
         const gameData = [
             {
@@ -474,6 +475,25 @@
                 "статусдляв": "normal"
             }
         ];
+
+        window.addEventListener('load', function () {
+            if (typeof pipwerks !== 'undefined') {
+                console.log('pipwerks загружен');
+                pipwerks.SCORM.version = '2004'; 
+                const success = pipwerks.SCORM.init();
+                if (success) {
+                    console.log('SCORM 2004 инициализация прошла успешно');
+                } else {
+                    console.error('Ошибка инициализации SCORM');
+                }
+            } else {
+                console.error('pipwerks не загружен');
+            }
+        });
+
+        window.addEventListener('beforeunload', function () {
+            pipwerks.SCORM.quit();
+        });
 
         // DOM elements
         const questionButtons = document.querySelectorAll('.question');
@@ -698,6 +718,15 @@
                 updateDots();
             } else {
                 // Game over - show end modal
+                pipwerks.SCORM.set('cmi.score.raw', score);
+                pipwerks.SCORM.set('cmi.score.min', 0);
+                pipwerks.SCORM.set('cmi.score.max', 100);
+
+                pipwerks.SCORM.set('cmi.completion_status', 'completed');
+                pipwerks.SCORM.set('cmi.success_status', 'passed');
+
+                pipwerks.SCORM.save();
+                pipwerks.SCORM.quit();
                 hideModal(gameContainer);
                 showModal(endModal);
             }
